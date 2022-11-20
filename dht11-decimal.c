@@ -166,6 +166,11 @@ static int dht11_decode(struct dht11 *dht11, int offset)
 
 	if (hum_int < 4) {
 		dht11->decimal_mode = DHT11_DECIMAL_MODE_DHT22;
+	} else if (hum_int > 100 || temp_int > 100 /* || temp_dec >= 10 || hum_dec >= 10*/) {
+		dev_err(dht11->dev,
+			"Don't know how to decode data: %d %d %d %d\n",
+			hum_int, hum_dec, temp_int, temp_dec);
+		return -EIO;
 	} else if (dht11->decimal_mode != DHT11_DECIMAL_MODE_IGNORE) {
 		if (temp_dec >= 10 || hum_dec >= 10) {
 			dht11->decimal_mode = DHT11_DECIMAL_MODE_Q88;
